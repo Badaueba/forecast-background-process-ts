@@ -1,7 +1,5 @@
 node_modules
 .data
-*.lock
-yarn.lock
 *.log
 dump.rdb
 .env
