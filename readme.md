@@ -19,10 +19,17 @@
 docker-compose up -d
 ```
 
+-   Install npm dependencies
+
+```
+yarn install
+
+```
+
 -   Start the application
 
 ```
 
-yarn install
+yarn start
 
 ```
