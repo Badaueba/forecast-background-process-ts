@@ -14,6 +14,8 @@ export type IJob<T = any> = {
 
 export interface IQueue<T = any> {
     add(data: T, options?: IQueueOptions): Promise<void>;
-    process(callback: (job: IJob, done: Function) => Promise<T>): Promise<any>;
+    process(
+        callback: (job: IJob, done: Function) => Promise<any>
+    ): Promise<any>;
     on(event: string, callback: (...args: any[]) => void): void;
 }
