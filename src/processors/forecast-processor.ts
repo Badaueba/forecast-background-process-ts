@@ -1,10 +1,33 @@
-import { ForecastNextDaysDto } from "../controllers/forecast";
+import { ForecastNextDaysDto, ForecastTodayDto } from "../controllers/forecast";
 import { database } from "../database/database";
 import { IProcessor } from "../queue/processor";
-import { IQueue } from "../queue/queue";
+import { IJob, IQueue } from "../queue/queue";
 import { IForecast } from "../services/forecast/forecast";
 
-export class ForecastProcessor extends IProcessor {
+export class ForecastTodayProcessor extends IProcessor {
+    constructor(queue: IQueue, private forecastService: IForecast) {
+        super(queue);
+        this.queue = queue;
+    }
+    async start() {
+        this.lyfeCycle();
+
+        return this.queue.process(async (job, done) => {
+            try {
+                const city = job.data;
+                const forecast = await this.forecastService.getForecastForCity(
+                    city
+                );
+                database.forecast.push(forecast);
+                done(null, forecast);
+            } catch (error) {
+                done(error);
+            }
+        });
+    }
+}
+
+export class ForecastNextDaysProcessor extends IProcessor {
     constructor(
         queue: IQueue<ForecastNextDaysDto>,
         private forecastService: IForecast
@@ -15,7 +38,7 @@ export class ForecastProcessor extends IProcessor {
     async start() {
         this.lyfeCycle();
 
-        return this.queue.process(async (job, done) => {
+        return this.queue.process(async (job: IJob, done) => {
             try {
                 const today = new Date();
 
